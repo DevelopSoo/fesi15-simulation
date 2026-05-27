@@ -1,21 +1,6 @@
+/* globals.css */
 @import "tailwindcss";
 
-@theme {
-  /* primary 페어 */
-  --color-primary: #0f172a;
-  --color-primary-foreground: #ffffff;
-
-  /* secondary 페어 */
-  --color-secondary: #f1f5f9;
-  --color-secondary-foreground: #0f172a;
-
-  /* destructive 페어 */
-  --color-destructive: #ef4444;
-  --color-destructive-foreground: #ffffff;
-
-  /* ghost hover용 */
-  --color-muted: #f1f5f9;
-
-  /* outline border용 */
-  --color-border: #e2e8f0;
+@theme inline {
+  --font-pretendard: var(--font-pretendard);
 }
