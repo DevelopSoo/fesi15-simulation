@@ -1,6 +1,1 @@
-/* globals.css */
 @import "tailwindcss";
-
-@theme inline {
-  --font-pretendard: var(--font-pretendard);
-}
