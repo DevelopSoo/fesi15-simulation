@@ -1,112 +1,45 @@
+// src/app/page.tsx
+
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion } from "motion/react";
+import { useState } from "react";
 
-export const AnimatedProgressBar = ({ maxValue = 100, height = 12 }) => {
-  // API 응답으로 받을 값을 저장할 상태
-  const [value, setValue] = useState(0);
-  // API 로딩 상태 관리
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // API 호출을 시뮬레이션 (실제로는 여기서 API 요청을 수행)
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        // 실제 API 호출 예시:
-        // const response = await fetch('your-api-endpoint');
-        // const data = await response.json();
-        // setValue(data.progressValue);
-
-        // API 호출 시뮬레이션 (0.5초 ~ 2초 사이 지연)
-        await new Promise((resolve) =>
-          setTimeout(resolve, 500 + Math.random() * 1500),
-        );
-
-        // 랜덤 값으로 시뮬레이션 (실제로는 API 응답 데이터를 사용)
-        const randomValue = Math.floor(Math.random() * 101); // 0 ~ 100 사이 랜덤 값;
-        setValue(randomValue);
-      } catch (error) {
-        console.error("데이터를 가져오는 중 오류 발생:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []); // 컴포넌트 마운트 시 한 번만 실행
-
-  // 퍼센트로 변환
-  const percentage = (value / maxValue) * 100;
+export default function AnimateCompare() {
+  const [animated, setAnimated] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   return (
-    <div className="w-full">
-      {/* 프로그레스바 컨테이너 */}
-      <div
-        className="w-full overflow-hidden rounded-full bg-gray-200"
-        style={{ height: `${height}px` }}
+    <div className="container">
+      {/* ❌ will-change 없음 — CPU 레이어로 처리 */}
+      {/* Layers 패널에서 별도 레이어로 보이지 않음 */}
+      <div>
+        <p>will-change ❌</p>
+        <div className={`box box-no-wc ${animated ? "animate" : ""}`} />
+      </div>
+
+      {/* ✅ will-change 있음 — GPU 레이어로 승격 */}
+      {/* Layers 패널에서 별도 Compositing Layer로 표시됨 */}
+      <div>
+        <p>will-change ✅</p>
+        <div
+          className={`box box-wc ${animated ? "animate" : ""}`}
+          // isAnimating인 경우 will-change 적용
+          style={{ willChange: isAnimating ? "transform" : "auto" }}
+          // 3. 애니메이션 완료 → will-change 해제
+          onTransitionEnd={() => setIsAnimating(false)}
+        />
+      </div>
+
+      {/* onMouseEnter: 클릭 전 미리 GPU 레이어 준비 */}
+      <button
+        onMouseLeave={() => setIsAnimating(false)}
+        // 1. hover 시 will-change 사전 적용
+        onMouseEnter={() => setIsAnimating(true)}
+        // 2. 클릭 시 애니메이션 시작
+        onClick={() => setAnimated((prev) => !prev)}
       >
-        {!isLoading && (
-          <motion.div
-            className="h-full bg-blue-500"
-            // 초기 width: 0 & 애니메이션 시작 시 width: `${percentage}%`
-            initial={{ width: 0 }}
-            animate={{ width: `${percentage}%` }}
-            transition={{
-              duration: 1.5,
-              ease: "easeOut",
-            }}
-          />
-        )}
-      </div>
-
-      {/* 로딩 및 값 표시 */}
-      <div className="mt-2 text-right text-sm">
-        {isLoading ? (
-          <div className="animate-pulse text-gray-500">데이터 로딩 중...</div>
-        ) : (
-          <motion.div
-            // 애니메이션 시작 시 아래 10px 위치 및 안보이게
-            initial={{ opacity: 0, y: 10 }}
-            // 애니메이션 종료 시 위로 이동하면서 보이게
-            animate={{ opacity: 1, y: 0 }}
-            className="font-medium text-blue-600"
-          >
-            {value} / {maxValue} ({percentage.toFixed(1)}%)
-          </motion.div>
-        )}
-      </div>
+        {animated ? "되돌리기" : "애니메이션 실행"}
+      </button>
     </div>
   );
-};
-
-// 여러 프로그레스바를 동시에 보여주는 예제 컴포넌트
-const ProgressBarExample = () => {
-  return (
-    <div className="mx-auto max-w-xl space-y-8 p-6">
-      <h2 className="mb-4 text-xl font-bold">
-        API 데이터로 애니메이션되는 프로그레스바
-      </h2>
-
-      <div className="space-y-6">
-        <div>
-          <h3 className="mb-2 text-lg font-medium">사용자 진행도</h3>
-          <AnimatedProgressBar maxValue={100} height={12} />
-        </div>
-
-        <div>
-          <h3 className="mb-2 text-lg font-medium">다운로드 상태</h3>
-          <AnimatedProgressBar maxValue={100} height={8} />
-        </div>
-
-        <div>
-          <h3 className="mb-2 text-lg font-medium">시스템 리소스</h3>
-          <AnimatedProgressBar maxValue={100} height={16} />
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default ProgressBarExample;
+}
