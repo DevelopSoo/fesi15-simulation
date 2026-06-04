@@ -1,6 +1,6 @@
-// app/layout.tsx
+// src/app/layout.tsx
 
-import LazyMotionProvider from "@/providers/LazyMotionProvider";
+import QueryProvider from "@/providers/QueryProvider";
 import "./globals.css";
 
 export default function RootLayout({
@@ -11,7 +11,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <LazyMotionProvider>{children}</LazyMotionProvider>
+        <QueryProvider>{children}</QueryProvider>
       </body>
     </html>
   );

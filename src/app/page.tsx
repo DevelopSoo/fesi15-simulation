@@ -2,44 +2,102 @@
 
 "use client";
 
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
-export default function AnimateCompare() {
-  const [animated, setAnimated] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
+type Post = {
+  id: number;
+  title: string;
+  body: string;
+};
 
+export default function Home() {
+  const { data, error, isLoading } = useQuery<Post[]>({
+    queryKey: ["posts"],
+    queryFn: async () => {
+      const response = await fetch("http://localhost:4000/posts");
+      if (!response.ok) {
+        throw new Error("서버에서 데이터를 가져오는 데 실패했습니다.");
+      }
+      return response.json();
+    },
+  });
+
+  const [values, setValues] = useState({
+    title: "",
+    body: "",
+  });
+
+  const queryClient = useQueryClient();
+
+  const createPostMutation = useMutation({
+    mutationFn: async (newPost: Omit<Post, "id">) => {
+      const response = await fetch("http://localhost:4000/posts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newPost),
+      });
+      if (!response.ok) {
+        throw new Error("포스트 생성에 실패했습니다.");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      // 성공적으로 포스트를 생성한 후, 데이터를 다시 가져옵니다.
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    createPostMutation.mutate(values);
+    setValues({ title: "", body: "" }); // 폼 초기화
+  };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div className="text-red-500">{error.message}</div>;
   return (
-    <div className="container">
-      {/* ❌ will-change 없음 — CPU 레이어로 처리 */}
-      {/* Layers 패널에서 별도 레이어로 보이지 않음 */}
+    <div className="flex h-screen items-center justify-center">
       <div>
-        <p>will-change ❌</p>
-        <div className={`box box-no-wc ${animated ? "animate" : ""}`} />
+        <form onSubmit={handleSubmit} className="mb-4 flex flex-col gap-2">
+          <div>
+            <label htmlFor="title">제목</label>
+            <input
+              id="title"
+              className="w-full rounded border border-gray-300 p-2"
+              value={values.title}
+              onChange={(e) => setValues({ ...values, title: e.target.value })}
+            />
+          </div>
+          <div>
+            <label htmlFor="body">본문</label>
+            <textarea
+              id="body"
+              className="w-full rounded border border-gray-300 p-2"
+              value={values.body}
+              onChange={(e) => setValues({ ...values, body: e.target.value })}
+            />
+          </div>
+          <button
+            type="submit"
+            className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+          >
+            제출
+          </button>
+        </form>
+        <ul>
+          {data?.map((item) => (
+            <li key={item.id} className="mb-2 border-b border-gray-300 pb-2">
+              <h3 className="font-bold">
+                {item.id}: {item.title}
+              </h3>
+              <p>{item.body}</p>
+            </li>
+          ))}
+        </ul>
       </div>
-
-      {/* ✅ will-change 있음 — GPU 레이어로 승격 */}
-      {/* Layers 패널에서 별도 Compositing Layer로 표시됨 */}
-      <div>
-        <p>will-change ✅</p>
-        <div
-          className={`box box-wc ${animated ? "animate" : ""}`}
-          // isAnimating인 경우 will-change 적용
-          style={{ willChange: isAnimating ? "transform" : "auto" }}
-          // 3. 애니메이션 완료 → will-change 해제
-          onTransitionEnd={() => setIsAnimating(false)}
-        />
-      </div>
-
-      {/* onMouseEnter: 클릭 전 미리 GPU 레이어 준비 */}
-      <button
-        onMouseLeave={() => setIsAnimating(false)}
-        // 1. hover 시 will-change 사전 적용
-        onMouseEnter={() => setIsAnimating(true)}
-        // 2. 클릭 시 애니메이션 시작
-        onClick={() => setAnimated((prev) => !prev)}
-      >
-        {animated ? "되돌리기" : "애니메이션 실행"}
-      </button>
     </div>
   );
 }
