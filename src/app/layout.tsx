@@ -2,6 +2,7 @@
 
 import QueryProvider from "@/providers/QueryProvider";
 import "./globals.css";
+import { MSWProvider } from "@/providers/MSWProvider";
 
 export default function RootLayout({
   children,
@@ -11,7 +12,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <QueryProvider>{children}</QueryProvider>
+        <MSWProvider>
+          <h1>prerendering</h1>
+          <QueryProvider>{children}</QueryProvider>
+        </MSWProvider>
       </body>
     </html>
   );
