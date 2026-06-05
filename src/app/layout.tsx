@@ -13,7 +13,6 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <MSWProvider>
-          <h1>prerendering</h1>
           <QueryProvider>{children}</QueryProvider>
         </MSWProvider>
       </body>
