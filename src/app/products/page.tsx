@@ -1,3 +1,4 @@
+// src/app/products/page.tsx
 import Link from "next/link";
 
 export default async function ProductsPage() {
@@ -16,7 +17,7 @@ export default async function ProductsPage() {
             image: string;
           }) => (
             <Link
-              className="border"
+              className="h-auto w-64 border"
               key={product.id}
               href={`/products/${product.id}`}
               data-testid={`product-${product.id}`}
@@ -32,7 +33,7 @@ export default async function ProductsPage() {
                 <p>{product.price}</p>
               </li>
             </Link>
-          )
+          ),
         )}
       </ul>
     </div>

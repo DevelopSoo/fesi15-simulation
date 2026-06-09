@@ -1,3 +1,5 @@
+// e2e/purchase.test.ts
+
 import { test, expect } from "@playwright/test";
 
 test("로그인 후 구매까지의 시나리오", async ({ page }) => {

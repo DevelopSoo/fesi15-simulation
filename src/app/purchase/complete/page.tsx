@@ -1,3 +1,5 @@
+// src/app/purchase/complete/page.tsx
+
 export default function PurchaseCompletePage() {
   return (
     <div>

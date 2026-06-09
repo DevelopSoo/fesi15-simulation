@@ -1,3 +1,4 @@
+// src/app/auth/login/page.tsx
 "use client";
 
 import Link from "next/link";
@@ -20,7 +21,6 @@ export default function LoginPage() {
     e.preventDefault();
     router.push("/products");
   };
-
   return (
     <>
       <h1>로그인 페이지</h1>
