@@ -5,14 +5,13 @@ jobs:
   create-output:
     runs-on: ubuntu-latest
     steps:
-	    # output 값 저장하는 step
       - name: output 저장
-	      # step의 id는 필수!
-        id: save-output 
+        # step의 id는 필수!
+        id: save-output
         run: echo "message=안녕" >> $GITHUB_OUTPUT
 
-			# output 값을 사용하는 step
+      # output 값을 사용하는 step
       - name: output 사용
-	      # steps 중에 save-output이라는 id를 가진 step에서 저장한 output 값 중 
-	      # key가 message인 값을 사용한다.
+        # steps 중에 save-output이라는 id를 가진 step에서 저장한 output 값 중
+        # key가 message인 값을 사용한다.
         run: echo "저장된 키는 ${{ steps.save-output.outputs.message }}입니다."
