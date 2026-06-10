@@ -1,13 +1,4 @@
 // src/app/page.tsx
-
-"use client";
-
-import { Button } from "@/stories/Button";
-
 export default function Home() {
-  return (
-    <>
-      <h1>게시글 목록2</h1>
-    </>
-  );
+  return <h1>메인 페이지</h1>;
 }
