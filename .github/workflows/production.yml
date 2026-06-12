@@ -31,6 +31,12 @@ jobs:
       - name: Vercel CLI 설치
         run: npm install --global vercel@latest
 
+      - name: Vercel Production 환경 설정 가져오기
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: 프로젝트 빌드
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
       # --prod: production 환경변수로 빌드하고 production 도메인으로 배포
-      - name: Vercel에 프로젝트 배포
-        run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
+      - name: 빌드된 결과물을 Vercel로 전달 및 배포
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
